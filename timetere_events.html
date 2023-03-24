@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Vue.jsでTimeTreeの予定表をAPIで取得してCSVで出力する</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    <button v-on:click="downloadCSV">CSVダウンロード</button>
+  </div>
+  <div id="app">
+    <table>
+      <thead>
+        <tr>
+          <th>タイトル</th>
+          <th>開始日時</th>
+          <th>終了日時</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="event in events" :key="event.id">
+          <td>{{ event.attributes.title }}</td>
+          <td>{{ event.attributes.start_at }}</td>
+          <td>{{ event.attributes.end_at }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>  
+
+  <script>
+    new Vue({
+      el: '#app',
+      el: '#app',
+    filters: {
+        moment: function (date) {
+            return moment(date).format('YYYY/MM/DD HH:mm');
+        }
+    },
+      data: {
+        events: [],
+        headers: ['id', 'title', 'start', 'end'],
+      },
+      methods: {
+        getEvents: function() {
+          axios.get('https://timetreeapis.com/calendars/mqDgcs8noUKy/upcoming_events?days=7', {
+            headers: {
+              'Accept': 'application/vnd.timetree.v1+json',
+              'Authorization': 'Bearer 2e4CvM5Q2hGPPAVM-2fevuNU5cmVrGnyA9F4qq2rFBQnrz1T'
+            }
+          })
+          .then(response => {
+            this.events = response.data.data.map(event => {
+              return {
+                id: event.id,
+                title: event.attributes.title,
+                start: event.attributes.start_at,
+                end: event.attributes.end_at,
+              }
+            })
+          })
+          .catch(error => {
+            console.log(error)
+          })
+        },
+        convertToCSV: function() {
+          let csv = '';
+          csv += this.headers.join(',') + '\n';
+          this.events.forEach(event => {
+            csv += Object.values(event).join(',') + '\n';
+          });
+          return csv;
+        },
+        downloadCSV: function() {
+          this.getEvents();
+          setTimeout(() => {
+            let csv = this.convertToCSV();
+            let blob = new Blob([csv], { type: 'text/csv' });
+            let link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'events.csv';
+            link.click();
+          }, 1000);
+        },
+      },
+    })
+  </script>
+</body>
+</html>

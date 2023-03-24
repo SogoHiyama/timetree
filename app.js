@@ -9,7 +9,7 @@ var app = new Vue({
         items:[],
     },
     mounted: function () {
-        axios.get("https://timetreeapis.com/calendars/J5DS8KxhvG6E/upcoming_events?days=7", 
-            { headers: {'Authorization': 'Bearer Jf8CogRJ1xBWPsJWkpULo6N0GBgJAcKRxvqbvMbmb1I61jq1'} }).then(response => (this.items = response.data.data))
+        axios.get("https://timetreeapis.com/calendars/mqDgcs8noUKy/upcoming_events?days=7", 
+            { headers: {'Authorization': 'Bearer 2e4CvM5Q2hGPPAVM-2fevuNU5cmVrGnyA9F4qq2rFBQnrz1T'} }).then(response => (this.items = response.data.data))
     }
 })
